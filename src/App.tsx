@@ -10,7 +10,7 @@ declare global {
 function App() {
   const [currentAccount, setCurrentAccount] = useState("");
 
-  /*const isConnected = async () => {
+  const isConnected = async () => {
     const { ethereum } = window;
     if (ethereum) {
       console.log("Connected!");
@@ -20,6 +20,7 @@ function App() {
 
       if (accounts.length > 0) {
         console.log("Found account", accounts[0])
+        setCurrentAccount(accounts[0])
       } else {
         console.log("No accounts found")
       }
@@ -27,11 +28,11 @@ function App() {
       alert('Please install MetaMask');
       return;
     }
-  }*/
+  }
 
-  /*useEffect(() => {
-    isConnected();
-  }, [])*/
+  useEffect(() => {
+    isConnected()
+  }, [])
 
   const connect = async () => {
     const { ethereum } = window;
@@ -47,20 +48,19 @@ function App() {
     }
   }
 
-  useEffect(() => {
-    connect();
-  }, [])
-
   const formatAddress = (address: String) => (address.substring(0, 5) + "..." + address.substr(-4, 4))
 
   return (
     <div className="App">
       <header className="App-header">
+      <div style={{margin: "10px"}}>
         {currentAccount !== "" ? (
           <span className="nes-text is-primary">{formatAddress(currentAccount)}</span>
         ) : (
-          <button onClick={() => connect()} className="nes-btn is-primary">Connect</button>
+          
+            <button onClick={() => connect()} className="nes-btn is-primary">Connect</button>
         )}
+      </div>
       </header>
     </div>
   );
