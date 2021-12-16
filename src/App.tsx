@@ -5,6 +5,7 @@ import { contractAddress } from './constants';
 import './App.css';
 import SelectCharacter from './SelectCharacter';
 import { Character } from './Character';
+import Arena from './Arena';
 
 declare global {
   interface Window {
@@ -109,6 +110,9 @@ function App() {
       <div className="App-main">
         {connected && !character && (
           <SelectCharacter setCharacterNFT={setCharacter}/>
+        )}
+        {connected && character && (
+          <Arena/>
         )}
       </div>
     </div>
