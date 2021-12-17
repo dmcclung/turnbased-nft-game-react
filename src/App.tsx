@@ -56,7 +56,9 @@ function App() {
     }
   }
 
-  const formatAddress = (address: string) => (address.substring(0, 5) + '...' + address.substr(-4, 4))
+  const formatAddress = (address: string) => (
+    address.substring(0, 5) + '...' + address.substring(address.length - 4)
+  )
 
   useEffect(() => {
     const fetchNFTMetadata = async () => {
