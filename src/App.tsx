@@ -16,6 +16,7 @@ declare global {
 function App() {
   const [currentAccount, setCurrentAccount] = useState('')
   const [character, setCharacter] = useState<Character>()
+  const [busyState, setBusyState] = useState<boolean>(false)
 
   const isConnected = async () => {
     const { ethereum } = window
@@ -99,6 +100,7 @@ function App() {
 
   return (
     <div className="App">
+      {busyState && <div className="loading-animation"></div>}
       <header className="App-header">
         <div style={{margin: '10px'}}>
           {connected ? (
@@ -110,10 +112,10 @@ function App() {
       </header>
       <div className="App-main">
         {connected && !character && (
-          <SelectCharacter setCharacterNFT={setCharacter}/>
+          <SelectCharacter setCharacterNFT={setCharacter} setBusyState={setBusyState}/>
         )}
         {connected && character && (
-          <Arena/>
+          <Arena setBusyState={setBusyState}/>
         )}
       </div>
     </div>

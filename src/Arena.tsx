@@ -4,7 +4,11 @@ import { contractAddress } from './constants'
 import { Character } from './Character'
 import gameAbi from './Game.json'
 
-const Arena = () => {
+type ArenaProps = {
+  setBusyState: (b: boolean) => void;
+}
+
+const Arena = ({setBusyState}: ArenaProps) => {
   const [contract, setContract] = useState<Contract>()
   const [boss, setBoss] = useState<Character>()
   const [player, setPlayer] = useState<Character>()
@@ -111,6 +115,7 @@ const Arena = () => {
   const attack = async () => {
     try {
       if (contract) {
+        setBusyState(true)
         setAttackState('attacking')
         console.log('Attacking boss...')
         const attackTxn = await contract.attackBoss()
@@ -121,6 +126,8 @@ const Arena = () => {
     } catch (error) {
       console.error('Error attacking boss:', error)
       setAttackState('')
+    } finally {
+      setBusyState(false)
     }
   }
 

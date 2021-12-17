@@ -7,6 +7,7 @@ import { Character } from './Character'
 
 type SelectCharacterProps = {
     setCharacterNFT: (a: Character) => void;
+    setBusyState: (b: boolean) => void;
 }
 
 type CharacterType = {
@@ -18,7 +19,7 @@ type CharacterType = {
     gold: BigNumber;
 }
 
-const SelectCharacter = ({ setCharacterNFT }: SelectCharacterProps) => {
+const SelectCharacter = ({ setCharacterNFT, setBusyState }: SelectCharacterProps) => {
   const [characters, setCharacters] = useState<Character[]>([])
 
   useEffect(() => {
@@ -54,18 +55,26 @@ const SelectCharacter = ({ setCharacterNFT }: SelectCharacterProps) => {
     const provider = new ethers.providers.Web3Provider(window.ethereum)
     const signer = provider.getSigner()
     const contract = new ethers.Contract(contractAddress, gameAbi.abi, signer)
-    const tx = await contract.mintPlayer(index)
-    await tx.wait()
 
-    const character = contract.getPlayer()
-    setCharacterNFT({
-        name: character.name,
-        image: character.image,
-        xp: character.xp,
-        hp: character.hp,
-        maxHp: character.maxHp,
-        gold: character.gold
-    })
+    try {
+      setBusyState(true)
+      const tx = await contract.mintPlayer(index)
+      await tx.wait()
+
+      const character = contract.getPlayer()
+      setCharacterNFT({
+          name: character.name,
+          image: character.image,
+          xp: character.xp,
+          hp: character.hp,
+          maxHp: character.maxHp,
+          gold: character.gold
+      })
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setBusyState(false)
+    }
   }
 
   const renderCharacters = () => {
@@ -75,7 +84,7 @@ const SelectCharacter = ({ setCharacterNFT }: SelectCharacterProps) => {
             <p>{character.name}</p>
         </div>
         <img src={character.image} alt={character.name} />
-        <button type="button" className="character-mint-button" onClick={() => mintPlayer(index)}>
+        <button type="button" className="nes-btn" onClick={() => mintPlayer(index)}>
             {`Mint ${character.name}`}
         </button>
         </div>

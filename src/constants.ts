@@ -1,3 +1,3 @@
-const contractAddress = '0xFe99F9B7Bdaad64fFA6A819B6605238647b43C78'
+const contractAddress = '0xF4bdfA09Fa8d0D07F40a4173Fa451738c6D7817F'
 
 export { contractAddress }
