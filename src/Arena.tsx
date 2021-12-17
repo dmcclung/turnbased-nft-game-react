@@ -110,17 +110,17 @@ const Arena = () => {
       {boss && (
           <div className="boss-container">
           <div className={`boss-content ${attackState}`}>
-            <h2>🔥 {boss.name} 🔥</h2>
+            <h2 style={{color: "white"}}>🔥 {boss.name} 🔥</h2>
             <div className="image-content">
               <img src={boss.image} alt={`Boss ${boss.name}`} />
               <div className="health-bar">
                 <progress value={boss.hp} />
-                <p>{`${boss.hp} HP / ${boss.xp} XP / ${boss.gold} Gold`}</p>
+                <p style={{color: "white"}}>{`${boss.hp} HP / ${boss.xp} XP / ${boss.gold} Gold`}</p>
               </div>
             </div>
           </div>
           <div className="attack-container">
-            <button className="cta-button" onClick={() => attack()}>
+            <button className="nes-btn" onClick={() => attack()}>
               {`💥 Attack ${boss.name}`}
             </button>
           </div>
@@ -129,18 +129,18 @@ const Arena = () => {
 
       {player && (
           <div className="players-container">
-          <div className="player-container">
-            <h2>Your Character</h2>
+          <div style={{margin: "30px"}} className="player-container">
+            <h2 style={{color: "white"}}>Your Character</h2>
             <div className="player">
               <div className="image-content">
-                <h2>{player.name}</h2>
+                <h2 style={{color: "white"}}>{player.name}</h2>
                 <img
                   src={player.image}
                   alt={`Character ${player.name}`}
                 />
                 <div className="health-bar">
                   <progress value={player.hp} />
-                  <p>{`${player.hp} HP / ${player.xp} XP / ${player.gold} Gold`}</p>
+                  <p style={{color: "white"}}>{`${player.hp} HP / ${player.xp} XP / ${player.gold} Gold`}</p>
                 </div>
               </div>
               <div className="stats">
