@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import './SelectCharacter.css';
-import { contractAddress } from './constants';
-import gameAbi from './Game.json';
-import { BigNumber, ethers } from 'ethers';
-import { Character } from './Character';
+import React, { useEffect, useState } from 'react'
+import './SelectCharacter.css'
+import { contractAddress } from './constants'
+import gameAbi from './Game.json'
+import { BigNumber, ethers } from 'ethers'
+import { Character } from './Character'
 
 type SelectCharacterProps = {
     setCharacterNFT: (a: Character) => void;
@@ -13,56 +13,59 @@ type CharacterType = {
     name: string;
     image: string;
     hp: BigNumber;
+    maxHp: BigNumber;
     xp: BigNumber;
     gold: BigNumber;
 }
 
 const SelectCharacter = ({ setCharacterNFT }: SelectCharacterProps) => {
-  const [characters, setCharacters] = useState<Character[]>([]);
+  const [characters, setCharacters] = useState<Character[]>([])
 
   useEffect(() => {
-    let canceled = false;
+    let canceled = false
     const getCharacterTypes = async () => {
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const signer = provider.getSigner();
+        const provider = new ethers.providers.Web3Provider(window.ethereum)
+        const signer = provider.getSigner()
         const contract = new ethers.Contract(contractAddress, gameAbi.abi, signer)
-        const characterTypes = await contract.getCharacterTypes();
-        const cleanedCharacterTypes: Character[] = [];
+        const characterTypes = await contract.getCharacterTypes()
+        const cleanedCharacterTypes: Character[] = []
         characterTypes.forEach((characterType: CharacterType) => {
             cleanedCharacterTypes.push({
                 name: characterType.name,
                 image: characterType.image,
                 hp: characterType.hp.toNumber(),
+                maxHp: characterType.maxHp.toNumber(),
                 xp: characterType.xp.toNumber(),
                 gold: characterType.gold.toNumber(),
-            });
-        });
+            })
+        })
         if (!canceled) {
-            setCharacters(cleanedCharacterTypes);
+            setCharacters(cleanedCharacterTypes)
         }
-    };
-
-    getCharacterTypes();
-    return () => {
-        canceled = true;
     }
-  }, []);
+
+    getCharacterTypes()
+    return () => {
+        canceled = true
+    }
+  }, [])
 
   const mintPlayer = async (index: number) => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
+    const provider = new ethers.providers.Web3Provider(window.ethereum)
+    const signer = provider.getSigner()
     const contract = new ethers.Contract(contractAddress, gameAbi.abi, signer)
-    const tx = await contract.mintPlayer(index);
-    await tx.wait();
+    const tx = await contract.mintPlayer(index)
+    await tx.wait()
 
-    const character = contract.getPlayer();
+    const character = contract.getPlayer()
     setCharacterNFT({
         name: character.name,
         image: character.image,
         xp: character.xp,
         hp: character.hp,
+        maxHp: character.maxHp,
         gold: character.gold
-    });
+    })
   }
 
   const renderCharacters = () => {
@@ -76,8 +79,8 @@ const SelectCharacter = ({ setCharacterNFT }: SelectCharacterProps) => {
             {`Mint ${character.name}`}
         </button>
         </div>
-    ));
-  };
+    ))
+  }
 
   return (
     <div className="select-character-container">
@@ -86,7 +89,7 @@ const SelectCharacter = ({ setCharacterNFT }: SelectCharacterProps) => {
           <div className="character-grid">{renderCharacters()}</div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default SelectCharacter;
+export default SelectCharacter

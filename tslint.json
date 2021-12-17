@@ -5,7 +5,9 @@
     ],
     "jsRules": {},
     "rules": {
-        "no-console": false
+        "no-console": false,
+        "semicolon": [true, "never"],
+        "quotemark": [true, "single", "jsx-double"]
     },
     "rulesDirectory": []
 }

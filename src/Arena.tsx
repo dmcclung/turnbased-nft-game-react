@@ -22,7 +22,7 @@ const Arena = () => {
             } else {
                 console.log('Problem getting ethereum')
             }
-        };
+        }
 
         setupContract()
     }, [])
@@ -34,7 +34,23 @@ const Arena = () => {
                 setPlayer(playerNft)
             }
         }
-        getPlayer()
+
+        const onPlayerContinued = () => {
+          console.log('PlayerContinued')
+          getPlayer()
+        }
+
+        if (contract) {
+          getPlayer()
+
+          contract.on('PlayerContinued', onPlayerContinued)
+        }
+
+        return () => {
+          if (contract) {
+            contract.off('PlayerContinued', onPlayerContinued)
+          }
+        }
     }, [contract])
 
     useEffect(() => {
@@ -46,10 +62,10 @@ const Arena = () => {
         }
 
         const onAttackComplete = (newBossHp: BigNumber, newPlayerHp: BigNumber) => {
-            const bossHp = newBossHp.toNumber();
-            const playerHp = newPlayerHp.toNumber();
+            const bossHp = newBossHp.toNumber()
+            const playerHp = newPlayerHp.toNumber()
 
-            console.log(`AttackComplete: Boss Hp: ${bossHp} Player Hp: ${playerHp}`);
+            console.log(`AttackComplete: Boss Hp: ${bossHp} Player Hp: ${playerHp}`)
 
             setBoss((prevState: Character | undefined) => {
                 if (prevState) {
@@ -57,12 +73,13 @@ const Arena = () => {
                         name: prevState.name,
                         image: prevState.image,
                         hp: bossHp,
+                        maxHp: prevState.maxHp,
                         xp: prevState.xp,
                         gold: prevState.gold
                     }
                     return newState
                 }
-            });
+            })
 
             setPlayer((prevState: Character | undefined) => {
                 if (prevState) {
@@ -70,22 +87,23 @@ const Arena = () => {
                         name: prevState.name,
                         image: prevState.image,
                         hp: playerHp,
+                        maxHp: prevState.maxHp,
                         xp: prevState.xp,
                         gold: prevState.gold
                     }
                     return newState
                 }
-            });
-        };
+            })
+        }
 
         if (contract) {
             getBoss()
-            contract.on('AttackComplete', onAttackComplete);
+            contract.on('AttackComplete', onAttackComplete)
         }
 
         return () => {
             if (contract) {
-                contract.off('AttackComplete', onAttackComplete);
+                contract.off('AttackComplete', onAttackComplete)
             }
         }
     }, [contract])
@@ -93,29 +111,49 @@ const Arena = () => {
     const attack = async () => {
         try {
             if (contract) {
-              setAttackState('attacking');
-              console.log('Attacking boss...');
-              const attackTxn = await contract.attackBoss();
-              await attackTxn.wait();
-              console.log('attackTxn:', attackTxn);
-              setAttackState('hit');
+              setAttackState('attacking')
+              console.log('Attacking boss...')
+              const attackTxn = await contract.attackBoss()
+              await attackTxn.wait()
+              console.log('attackTxn:', attackTxn)
+              setAttackState('hit')
             }
           } catch (error) {
-            console.error('Error attacking boss:', error);
-            setAttackState('');
+            console.error('Error attacking boss:', error)
+            setAttackState('')
           }
+    }
+
+    const continuePlayer = async () => {
+      if (contract) {
+        try {
+          const txn = await contract.continuePlayer()
+          await txn.wait()
+        } catch (err) {
+          console.log(err)
+        }
+      }
+    }
+
+    // TODO: Need to revive and improve progress bars
+
+    const getHpProgressStyle = (hp: number, maxHp: number) => {
+      const hpRemaining = (hp / maxHp) * 100
+      return hpRemaining >= 50 ? 'nes-progress is-success' :
+      hpRemaining >= 30 ? 'nes-progress is-warning' :
+      'nes-progress is-error'
     }
 
     return <div className="arena-container">
       {boss && (
           <div className="boss-container">
           <div className={`boss-content ${attackState}`}>
-            <h2 style={{color: "white"}}>🔥 {boss.name} 🔥</h2>
+            <h2 style={{color: 'white'}}>🔥 {boss.name} 🔥</h2>
             <div className="image-content">
               <img src={boss.image} alt={`Boss ${boss.name}`} />
               <div className="health-bar">
-                <progress value={boss.hp} />
-                <p style={{color: "white"}}>{`${boss.hp} HP / ${boss.xp} XP / ${boss.gold} Gold`}</p>
+                <progress className={getHpProgressStyle(boss.hp, boss.maxHp)} value={boss.hp} max={boss.maxHp} />
+                <p style={{color: 'white'}}>{`${boss.hp} HP / ${boss.xp} XP / ${boss.gold} Gold`}</p>
               </div>
             </div>
           </div>
@@ -129,20 +167,28 @@ const Arena = () => {
 
       {player && (
           <div className="players-container">
-          <div style={{margin: "30px"}} className="player-container">
-            <h2 style={{color: "white"}}>Your Character</h2>
+          <div style={{margin: '30px'}} className="player-container">
+            <h2 style={{color: 'white'}}>Your Character</h2>
             <div className="player">
               <div className="image-content">
-                <h2 style={{color: "white"}}>{player.name}</h2>
+                <h2 style={{color: 'white'}}>{player.name}</h2>
                 <img
                   src={player.image}
                   alt={`Character ${player.name}`}
                 />
                 <div className="health-bar">
-                  <progress value={player.hp} />
-                  <p style={{color: "white"}}>{`${player.hp} HP / ${player.xp} XP / ${player.gold} Gold`}</p>
+                  <progress className={getHpProgressStyle(player.hp, player.maxHp)} value={player.hp} max={player.maxHp} />
+                  <p style={{color: 'white'}}>{`${player.hp} HP / ${player.xp} XP / ${player.gold} Gold`}</p>
                 </div>
               </div>
+              {player.hp === 0 &&
+                <div>
+                  <p style={{color: 'white'}}>You have fainted</p>
+                  <button className="nes-btn" onClick={() => continuePlayer()}>
+                    {`❤️ Continue`}
+                  </button>
+                </div>
+              }
               <div className="stats">
               </div>
             </div>
